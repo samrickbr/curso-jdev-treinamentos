@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CRUD com SpringBoot</title>
+<link
+	href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+	rel="stylesheet"
+	integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+	crossorigin="anonymous">
+
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+<style type="text/css">
+html {
+	margin-left: 5%;
+	margin-right: 5%;
+	margin-top: 5%;
+	margin-bottom: 5%;
+}
+</style>
+</head>
+<body>
+	<p>
+	<h2>Cadastro de Usuário</h2>
+
+	<form action="" id="formCadastroUser">
+		<div class="form-group col-md-6">
+			<div class="col-md-6">
+				<label for="id" class="form-label">ID</label> <input type="number"
+					class="form-control" id="id" placeholder="ID do Usuário"
+					disabled="disabled">
+			</div>
+
+			<div class="row">
+				<div class="col">
+					<div class="mb-3">
+						<label for="nome" class="form-label">Nome</label> <input
+							type="text" class="form-control" id="nome"
+							placeholder="Nome do Usuário" required="required">
+					</div>
+				</div>
+
+				<div class="col">
+					<div class="mb-3">
+						<label for="idade" class="form-label">Idade</label> <input
+							type="number" class="form-control" id="idade"
+							placeholder="Idade do Usuário">
+					</div>
+				</div>
+			</div>
+		</div>
+
+	</form>
+
+	<button type="button" class="btn btn-outline-primary"
+		onclick=" novo();">Novo</button>
+
+	<button type="button" class="btn btn-outline-success" id="btnSalvar"
+		onclick="salvarUsuario();">Salvar</button>
+
+	<!-- Button trigger modal -->
+	<button type="button" class="btn btn-outline-info"
+		data-bs-toggle="modal" data-bs-target="#modalPesquisarUser"
+		data-bs-whatever="">Pesquisar Usuário</button>
+
+	<button type="button" class="btn btn-outline-danger" id="btnDeletarr"
+		onclick="btnDeleteUser();">Deletar</button>
+
+	<div class="modal fade" id="modalPesquisarUser" tabindex="-1"
+		aria-labelledby="ModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title" id="ModalLabel">Pesquisar Usuário</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"
+						aria-label="Close"></button>
+				</div>
+				<div class="modal-body">
+					<form>
+						<div class="mb-3">
+							<label for="recipient-name" class="col-form-label">Nome
+								usuário:</label> <input type="text" class="form-control" id="nomeBusca">
+						</div>
+						<button type="button" class="btn btn-outline-warning"
+							onclick="buscarUser();">Pesquisar</button>
+						<form>
+							<div style="height: 300px; overflow: scroll;">
+								<table class="table" id="tblPesqUser">
+									<thead class="table-dark">
+										<tr>
+											<th scope="col">ID</th>
+											<th scope="col">NOME</th>
+											<th scope="col">IDADE</th>
+											<th scope="col">EDITAR</th>
+											<th scope="col">DELETAR</th>
+										</tr>
+									</thead>
+									<tbody>
+									</tbody>
+								</table>
+							</div>
+						</form>
+
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-outline-secondary"
+						data-bs-dismiss="modal">Fechar</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!--********************************************************************************************** -->
+	<script
+		src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+		integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+		crossorigin="anonymous"></script>
+
+	<link
+		href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+		rel="stylesheet"
+		integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+		crossorigin="anonymous">
+
+
+	<!--********************************************************************************************** -->
+	<script type="text/javascript">
+		function botaoSalvar() {
+			var id = $("#id").val;
+
+			if (id == null) {
+				document.getElementById("btnSalvar").innerHTML = 'Salvar'
+			}
+			document.getElementById("btnSalvar").innerHTML = 'Atualizar'
+		}
+
+		function btnDeleteUser() {
+			var id = $("#id").val();
+
+			if (id != null && id.trim != '') {
+				apagarUser(id);
+				novo();
+			}
+		}
+
+		function apagarUser(id) {
+			if (confirm("Deseja relamente deletar?")) {
+				$.ajax({
+					method : 'DELETE',
+					url : 'deletar',
+					data : "iduser=" + id,
+					success : function(response) {
+						$("#" + id).remove();
+						alert(response);
+					}
+				}).fail(function(xhr, status, errorThrown) {
+					alert("Erro ao deletar o usuário. " + xhr.responseText);
+				});
+			}
+		}
+
+		function salvarUsuario() {
+
+			botaoSalvar();
+
+			var id = $("#id").val();
+			var nome = $("#nome").val();
+			var idade = $("#idade").val();
+
+			if (nome == null || nome != null && nome.trim() == '') {
+				$("#nome").focus();
+				alert("Informe o nome!");
+				return;
+			}
+
+			$.ajax({
+				method : 'POST',
+				url : 'salvar',
+				data : JSON.stringify({
+					id : id,
+					nome : nome,
+					idade : idade
+				}),
+				contentType : "application/json; charset=utf-8",
+				success : function(response) {
+					$("#id").val(response.id);
+					alert("Usuário salvo com sucesso!");
+				}
+			}).fail(function(xhr, status, errorThrown) {
+				alert("Erro ao salvar cadastro: " + xhr.responseText);
+			});
+		}
+
+		function novo() {
+			document.getElementById('formCadastroUser').reset();
+			document.getElementById("btnSalvar").innerHTML = 'Salvar';
+		}
+
+		function buscarUser() {
+			var nome = $('#nomeBusca').val();
+			if (nome != null && nome.trim() != '') {
+				$
+						.ajax(
+								{
+									method : 'GET',
+									url : 'buscarPorNome',
+									data : "name=" + nome,
+									success : function(response) {
+										$('#tblPesqUser > tbody > tr').remove();
+
+										for (var i = 0; i < response.length; i++) {
+											$('#tblPesqUser > tbody')
+													.append(
+															'<tr id="'+response[i].id+'"><td>'
+																	+ response[i].id
+																	+ '</td><td>'
+																	+ response[i].nome
+																	+ '</td><td>'
+																	+ response[i].idade
+																	+ '</td><td><button type="button" class="btn btn-outline-dark" onclick="editarUser('
+																	+ response[i].id
+																	+ ')">Editar</button></td>'
+																	+ '<td><button type="button" class="btn btn-outline-danger" onclick="apagarUser('
+																	+ response[i].id
+																	+ ')">Apagar</button></td></tr>');
+										}
+									}
+								}).fail(
+								function(xhr, status, errorThrown) {
+									alert("Erro ao buscar usuário."
+											+ xhr.responseText);
+								});
+			}
+		}
+
+		function editarUser(id) {
+			$.ajax({
+				method : 'GET',
+				url : 'buscarporid',
+				data : "iduser=" + id,
+				success : function(response) {
+					$("#id").val(response.id);
+					$("#nome").val(response.nome);
+					$("#idade").val(response.idade);
+
+					$('#modalPesquisarUser').modal('hide');
+				}
+			}).fail(function(xhr, status, errorThrown) {
+				alert("Erro ao buscar usuário por ID." + xhr.responseText);
+			});
+		}
+	</script>
+</body>
+</html>
